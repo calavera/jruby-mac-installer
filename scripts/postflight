@@ -1,0 +1,6 @@
+#!/bin/sh -x
+
+if [ ! -f /usr/local/bin/jruby ]
+then
+    ln -s "/usr/local/jruby/bin/jruby" "/usr/local/bin/jruby"
+fi
