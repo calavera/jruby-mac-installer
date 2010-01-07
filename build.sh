@@ -14,10 +14,8 @@ jruby_version=$2
 unzip $jruby_dist/jruby-bin-$jruby_version.zip -d .;  # unpacking jruby.zip
 mv jruby-$jruby_version jruby_dist;
 
-find . -type f -name .DS_Store -print0 | xargs -0 rm;  # removing .DS_Store files
+/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-installer.pmdoc --out $jruby_dist/JRuby.pkg;
 
-sudo chown -R root:wheel jruby_dist;  #  we have to already set the privileges that the contents need after the installation
+rm -rf jruby_dist;
 
-/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -v -f . -doc JRuby-installer.pmdoc -p $jruby_dist/JRuby.pkg -i Info.plist;
-
-sudo rm -rf jruby_dist;
+echo 'Done.';
