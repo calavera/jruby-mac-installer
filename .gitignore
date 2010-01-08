@@ -1,2 +1,3 @@
 .DS_Store
-jruby_dist/**
+jruby_dist
+pkg

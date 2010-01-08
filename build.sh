@@ -18,9 +18,13 @@ jruby_version=$2
 unzip $jruby_dist/jruby-bin-$jruby_version.zip -d .;  # unpacking jruby.zip
 mv jruby-$jruby_version jruby_dist;
 
+mkdir pkg;
 /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
--v --doc JRuby-installer.pmdoc --out $jruby_dist/JRuby-$jruby_version.pkg --version $jruby_version;
+-v --doc JRuby-installer.pmdoc --out pkg/JRuby-$jruby_version.pkg --version $jruby_version;
 
-rm -rf jruby_dist;
+hdiutil create $jruby_dist/JRuby-$jruby_version.dmg -volname JRuby -fs HFS+ -srcfolder pkg;
+
+rm -r jruby_dist;
+rm -r pkg;
 
 echo 'Done.';
