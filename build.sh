@@ -18,17 +18,14 @@
 jruby_source=$1
 jruby_version=$2
 
-#unzip $jruby_dist/jruby-bin-$jruby_version.zip -d .;  # unpacking jruby.zip
-#mv jruby-$jruby_version jruby_dist;
-
 ant -f $jruby_source/build.xml dist
 
 unzip $jruby_source/dist/jruby-bin-$jruby_version.zip -d .;  # unpacking jruby.zip
+
 echo 'installing the native launcher'
 jruby-$jruby_version/bin/jruby -S gem install jruby-launcher
 
 mv jruby-$jruby_version jruby_dist;
-#cp -r $jruby_source/dist/jruby-bin-$jruby_version jruby_dist
 
 echo 'setting package version' # HACKY!!
 preflight="scripts/preflight.create-framework"
