@@ -1,0 +1,19 @@
+#!/bin/sh
+
+JRUBYVER="@JRUBYVER@"
+JRUBY_ROOT="/Library/Frameworks/JRuby.framework/Versions"
+
+JRUBY_VERSION_PATH="$JRUBY_ROOT/$JRUBYVER"
+JRUBY_CURRENT_PATH="$JRUBY_ROOT/Current"
+
+if [ ! -f $JRUBY_VERSION_PATH ]
+then
+    mkdir -p $JRUBY_VERSION_PATH
+fi
+
+if [ -f $JRUBY_CURRENT_PATH ]
+then
+    rm $JRUBY_CURRENT_PATH
+fi
+
+ln -s $JRUBY_VERSION_PATH $JRUBY_CURRENT_PATH
