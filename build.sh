@@ -43,14 +43,14 @@ mkdir pkg;
 /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
 -v --doc JRuby-installer.pmdoc --out pkg/JRuby-$jruby_version.pkg --version $jruby_version;
 
-#hdiutil create $jruby_source/dist/JRuby-$jruby_version.dmg -volname \
-#JRuby-$jruby_version -fs HFS+ -srcfolder pkg;
+hdiutil create $jruby_source/dist/JRuby-$jruby_version.dmg -volname \
+JRuby-$jruby_version -fs HFS+ -srcfolder pkg;
 
 echo 'cleaning directories'
 mv "$postflight.back" $postflight
 mv "$pmdoc.back" $pmdoc
 
 rm -r jruby_dist;
-#rm -r pkg;
+rm -r pkg;
 
 echo 'Done.';
