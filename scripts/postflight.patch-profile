@@ -6,7 +6,19 @@ echo "These changes will be effective only in shell windows that you open"
 echo "after running this script."
 
 JRUBYVER="@JRUBYVER@"
-JRUBY_ROOT="/Library/Frameworks/JRuby.framework/Versions/Current"
+JRUBY_ROOT="/Library/Frameworks/JRuby.framework/Versions"
+
+JRUBY_VERSION_PATH="$JRUBY_ROOT/$JRUBYVER"
+JRUBY_CURRENT_PATH="$JRUBY_ROOT/Current"
+
+if [ -f $JRUBY_CURRENT_PATH ]
+then
+    rm $JRUBY_CURRENT_PATH
+fi
+
+ln -s $JRUBY_VERSION_PATH $JRUBY_CURRENT_PATH
+
+$JRUBY_VERSION_PATH/bin/jruby -S gem install jruby-launcher --no-ri --no-rdoc > /tmp/jruby_installer.log 2> /tmp/jruby_installer.err
 
 if [ `id -ur` = 0 ]; then
     # Run from the installer, do some trickery to fetch the information
@@ -17,7 +29,7 @@ else
     theShell="${SHELL}"
 fi
 
-# Make sure the directory ${JRUBY_ROOT}/bin is on the users PATH.
+# Make sure the directory ${JRUBY_CURRENT_PATH}/bin is on the users PATH.
 BSH="`basename "${theShell}"`"
 case "${BSH}" in
 bash|ksh|sh|*csh)
@@ -33,18 +45,16 @@ bash|ksh|sh|*csh)
     ;;
 esac
 
-# Now ensure that our bin directory is on $JRUBY_ROOT and before /usr/bin at that
+# Now ensure that our bin directory is on $JRUBY_CURRENT_PATH and before /usr/bin at that
 for elem in `echo $P | tr ':' ' '`
 do
-    if [ "${elem}" = "${JRUBY_ROOT}/bin" ]; then
+    if [ "${elem}" = "${JRUBY_CURRENT_PATH}/bin" ]; then
         echo "All right, you're a jruby lover already"
         exit 0
-    elif [ "${elem}" = "/usr/bin" ]; then
-        break
     fi
 done
 
-echo "${JRUBY_ROOT}/bin is not on your PATH or at least not early enough"
+echo "${JRUBY_CURRENT_PATH}/bin is not on your PATH or at least not early enough"
 case "${BSH}" in
 *csh)
 	if [ -f "${HOME}/.tcshrc" ]; then
@@ -59,7 +69,7 @@ case "${BSH}" in
 	echo "" >> "${RC}"
 	echo "# Setting PATH for JRuby ${JRUBYVER}" >> "${RC}"
 	echo "# The orginal version is saved in .cshrc.jrubysave" >> "${RC}"
-	echo "set path=(${JRUBY_ROOT}/bin "'$path'")" >> "${RC}"
+	echo "set path=(${JRUBY_CURRENT_PATH}/bin "'$path'")" >> "${RC}"
 	if [ `id -ur` = 0 ]; then
 		chown "${USER}" "${RC}"
 	fi
@@ -88,7 +98,7 @@ fi
 echo "" >> "${PR}"
 echo "# Setting PATH for JRuby ${JRUBYVER}" >> "${PR}"
 echo "# The orginal version is saved in `basename ${PR}`.jrubysave" >> "${PR}"
-echo 'PATH="'"${JRUBY_ROOT}/bin"':${PATH}"' >> "${PR}"
+echo 'PATH="${PATH}:'"${JRUBY_CURRENT_PATH}/bin"'"' >> "${PR}"
 echo 'export PATH' >> "${PR}"
 if [ `id -ur` = 0 ]; then
 	chown "${USER}" "${PR}"
