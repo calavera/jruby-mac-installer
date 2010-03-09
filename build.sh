@@ -15,6 +15,12 @@
 # /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -help
 #
 
+if [ $# -ne 2 ]
+then
+  echo "Usage: ./`basename $0` jruby_source_dir jruby_version"
+  exit 1
+fi
+
 jruby_source=$1
 jruby_version=$2
 
