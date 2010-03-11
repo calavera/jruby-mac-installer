@@ -5,8 +5,7 @@ Follow this steps to build the installer:
 
 From the command line:
 
-  run ./build.sh JRUBY_SOURCE_DIRECTORY JRUBY_VERSION
-
+  run ruby setup.rb JRUBY_SOURCE_DIRECTORY JRUBY_VERSION
 
 
 TODO:
