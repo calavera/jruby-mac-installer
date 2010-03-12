@@ -11,6 +11,9 @@ JVERSION = ARGV[1]
 DIST = "#{HOME}/dist"
 POSTFLIGHT = "scripts/postflight.patch-profile"
 PMDOC = "JRuby-installer.pmdoc/01jruby.xml"
+MACDIST = "jruby_dist"
+GEMSDIST = "gems_dist"
+GEMSDEFAULTS = "#{MACDIST}/lib/ruby/site_ruby/1.8/rubygems/defaults"
 
 def replace_version_in(path)
   cp path, "#{path}.back"
@@ -22,8 +25,17 @@ def replace_version_in(path)
 end
 
 def restore(path)
-  cp "#{path}.back", path
-  rm "#{path}.back"
+  mv "#{path}.back", path
+end
+
+def prepare_rubygems
+  cp "rubygems/jruby_mac.rb", GEMSDEFAULTS
+
+  File.open("#{GEMSDEFAULTS}/jruby.rb", "a+") do |file|
+    file.write("require 'rubygems/defaults/jruby_mac'")
+  end
+
+  mv "#{MACDIST}/lib/ruby/gems", GEMSDIST
 end
 
 puts "- Preparing JRuby distribution"
@@ -34,29 +46,30 @@ end
 
 `unzip #{DIST}/jruby-bin-#{JVERSION}.zip -d .`
 
-mv "jruby-#{JVERSION}", "jruby_dist"
+mv "jruby-#{JVERSION}", MACDIST
+
+prepare_rubygems
 
 puts "- Setting package version"
 
 replace_version_in POSTFLIGHT
 replace_version_in PMDOC
 
-puts "- Building package"
+puts "- Building package, it takes a while, be patient my friend"
 
 mkdir "pkg"
 
-`/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
--v --doc JRuby-installer.pmdoc --out pkg/JRuby-#{JVERSION}.pkg --version #{JVERSION}`
+`/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-installer.pmdoc --out pkg/JRuby-#{JVERSION}.pkg --version #{JVERSION}`
 
-`hdiutil create #{DIST}/JRuby-#{JVERSION}.dmg -volname \
-JRuby-#{JVERSION} -fs HFS+ -srcfolder pkg`
+`hdiutil create #{DIST}/JRuby-#{JVERSION}.dmg -volname JRuby-#{JVERSION} -fs HFS+ -srcfolder pkg`
 
 puts "- Cleaning directories"
 
 restore POSTFLIGHT
 restore PMDOC
 
-rm_r "jruby_dist"
+rm_r MACDIST
+rm_r GEMSDIST
 rm_r "pkg"
 
 puts "- Done"

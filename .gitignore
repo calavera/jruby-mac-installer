@@ -1,3 +1,5 @@
 .DS_Store
 jruby_dist
 pkg
+gems_dist
+*.back
