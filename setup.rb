@@ -1,4 +1,7 @@
-puts "Usage: ruby setup.rb jruby_source_dir jruby_version" unless ARGV.size == 2
+unless ARGV.size == 2
+  puts "Usage: ruby setup.rb jruby_source_dir jruby_version"
+  exit -1
+end
 
 require 'fileutils'
 include FileUtils
