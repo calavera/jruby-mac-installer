@@ -16,45 +16,38 @@ then
     rm $JRUBY_CURRENT_PATH
 fi
 
+# create symlink to the current directory
 ln -s $JRUBY_VERSION_PATH $JRUBY_CURRENT_PATH
 
+# install native launcher
 $JRUBY_VERSION_PATH/bin/jruby -S gem install jruby-launcher --no-ri --no-rdoc > /tmp/jruby_installer.log 2> /tmp/jruby_installer.err
 
+# check if a previous verison of JRuby exists. Perhaps it's less safe but
+# it's also less hacky and if the user changes his path we keep his choice
+INSTALLED_VERSIONS=`ls $JRUBY_ROOT | wc -l`
+if [ $INSTALLED_VERSIONS -gt 2 ]
+then
+    echo "Seems JRuby was previously installed, skipping path modification" >> /tmp/jruby.installer.log
+    exit 0
+fi
+
+check_previous_patch() {
+    if grep -q 'Setting PATH for JRuby' "$1"
+        then exit 0
+    fi
+}
+
+# add current directory to the user's profile
+echo "${JRUBY_CURRENT_PATH}/bin is not on your PATH" 
 if [ `id -ur` = 0 ]; then
     # Run from the installer, do some trickery to fetch the information
     # we need.
     theShell="`finger $USER | grep Shell: | head  -1 | awk '{ print $NF }'`"
-
 else
     theShell="${SHELL}"
 fi
 
-# Make sure the directory ${JRUBY_CURRENT_PATH}/bin is on the users PATH.
 BSH="`basename "${theShell}"`"
-case "${BSH}" in
-bash|ksh|sh|*csh)
-    if [ `id -ur` = 0 ]; then
-        P=`su - ${USER} -c 'echo A-X-4-X@@$PATH@@X-4-X-A' | grep 'A-X-4-X@@.*@@X-4-X-A' | sed -e 's/^A-X-4-X@@//g' -e 's/@@X-4-X-A$//g'`
-    else
-        P="`(exec -l ${theShell} -c 'echo $PATH')`"
-    fi
-    ;;
-*)
-    echo "Sorry, I don't know how to patch $BSH shells"
-    exit 0
-    ;;
-esac
-
-# Now ensure that our bin directory is on $JRUBY_CURRENT_PATH and before /usr/bin at that
-for elem in `echo $P | tr ':' ' '`
-do
-    if [ "${elem}" = "${JRUBY_CURRENT_PATH}/bin" ]; then
-        echo "All right, you're a jruby lover already"
-        exit 0
-    fi
-done
-
-echo "${JRUBY_CURRENT_PATH}/bin is not on your PATH or at least not early enough"
 case "${BSH}" in
 *csh)
 	if [ -f "${HOME}/.tcshrc" ]; then
@@ -62,6 +55,9 @@ case "${BSH}" in
 	else
 		RC="${HOME}/.cshrc"
 	fi
+    #check previous patches
+    check_previous_patch ${RC}
+
 	# Create backup copy before patching
 	if [ -f "${RC}" ]; then
 		cp -fp "${RC}" "${RC}.jrubysave"
@@ -90,6 +86,9 @@ bash)
 	PR="${HOME}/.profile"
 	;;
 esac
+
+#check previous patches
+check_previous_patch $PR
 
 # Create backup copy before patching
 if [ -f "${PR}" ]; then
