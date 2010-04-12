@@ -25,7 +25,9 @@ def replace_version_in(path)
 end
 
 def restore(path)
-  mv "#{path}.back", path
+  if File.exist? "#{path}.back"
+    mv "#{path}.back", path
+  end
 end
 
 def prepare_rubygems
@@ -38,13 +40,40 @@ def prepare_rubygems
   mv "#{MACDIST}/lib/ruby/gems", GEMSDIST
 end
 
+def cleanup
+  restore POSTFLIGHT
+  restore PMDOC
+  
+  [MACDIST, GEMSDIST, "pkg"].each do |f|
+    rm_r f if File.exist? f
+  end
+  
+  exit
+end
+
+def exec_and_cleanup(cmd)
+  begin
+    %x(#{cmd})
+  rescue
+    puts "#{cmd} failed. Aborting."
+    cleanup
+  end
+end
+
+
+trap "SIGINT" do
+  puts "Received SIGINT. Aborting."
+  cleanup
+end
+
+
 puts "- Preparing JRuby distribution"
 
 cd HOME do
-  `ant clean dist`
+  exec_and_cleanup "ant clean dist"
 end
 
-`unzip #{DIST}/jruby-bin-#{JVERSION}.zip -d .`
+exec_and_cleanup "unzip #{DIST}/jruby-bin-#{JVERSION}.zip -d ."
 
 mv "jruby-#{JVERSION}", MACDIST
 
@@ -57,19 +86,14 @@ replace_version_in PMDOC
 
 puts "- Building package, it takes a while, be patient my friend"
 
-mkdir "pkg"
+mkdir_p "pkg"
 
-`/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-installer.pmdoc --out pkg/JRuby-#{JVERSION}.pkg --version #{JVERSION}`
+exec_and_cleanup "time /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-installer.pmdoc --out pkg/JRuby-#{JVERSION}.pkg --version #{JVERSION}"
 
-`hdiutil create #{DIST}/JRuby-#{JVERSION}.dmg -volname JRuby-#{JVERSION} -fs HFS+ -srcfolder pkg`
+exec_and_cleanup "time hdiutil create #{DIST}/JRuby-#{JVERSION}.dmg -volname JRuby-#{JVERSION} -fs HFS+ -srcfolder pkg"
 
 puts "- Cleaning directories"
 
-restore POSTFLIGHT
-restore PMDOC
-
-rm_r MACDIST
-rm_r GEMSDIST
-rm_r "pkg"
+cleanup
 
 puts "- Done"
