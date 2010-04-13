@@ -2,4 +2,5 @@
 jruby_dist
 pkg
 gems_dist
-*.back
+JRuby-installer.pmdoc/01jruby.xml
+scripts/postflight.patch-profile
