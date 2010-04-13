@@ -1,0 +1,41 @@
+#!/bin/sh
+
+JRUBYVER="<%= JVERSION %>"
+JRUBY_ROOT="<%= JRUBY_DEST %>/Versions"
+
+JRUBY_VERSION_PATH="$JRUBY_ROOT/$JRUBYVER"
+JRUBY_CURRENT_PATH="$JRUBY_ROOT/Current"
+
+JRUBY_INSTALLER_LOG="$TMPDIR/jruby.uninstaller.log"
+JRUBY_INSTALLER_ERR="$TMPDIR/jruby.uninstaller.err"
+
+if [ ! -d $JRUBY_VERSION_PATH ]
+then
+    echo "seems JRuby version $JRUBYVER is not installed in $JRUBY_VERSION_PATH"
+    exit
+fi
+
+BACKUP="$TMPDIR/jruby_unistaller_backup_$(date +%s)" 
+mkdir $BACKUP
+cp $JRUBY_VERSION_PATH $BACKUP
+
+echo "removing $JRUBY_VERSION_PATH"
+rm -r $JRUBY_VERSION_PATH
+rm $JRUBY_CURRENT_PATH
+
+
+#FIXME: Look for previous versions
+IFS="."; declare -a Array=($JRUBYVER)
+MAJOR=${Array[0]}
+MINOR=${Array[1]}
+PATCH=${Array[2]}
+
+PREVIOUS_VERSION=''
+for version in `ls $JRUBY_ROOT`
+do
+    
+done
+
+#FIXME: Remove Jruby from the path if there isn't a previous version
+
+echo "JRuby uninstalled succesfully!"

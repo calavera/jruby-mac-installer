@@ -26,7 +26,7 @@ GEMSDEFAULTS = "#{MACDIST}/lib/ruby/site_ruby/1.8/rubygems/defaults"
 
 UNINSTALLER_INDEX = 'JRuby-uninstaller.pmdoc/index.xml'
 UNINSTALLER_PMDOC = 'JRuby-uninstaller.pmdoc/01uninstaller.xml'
-UNINSTALLER_SCRIPT = 'scripts/uninstaller.rb'
+UNINSTALLER_SCRIPT = 'scripts/uninstaller.postinstall'
 
 #           #
 #  HELPERS  #
