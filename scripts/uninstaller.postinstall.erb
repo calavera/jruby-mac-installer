@@ -15,27 +15,75 @@ then
     exit
 fi
 
+
+#
+# creates a backup of the installed version
+#
 BACKUP="$TMPDIR/jruby_unistaller_backup_$(date +%s)" 
 mkdir $BACKUP
-cp $JRUBY_VERSION_PATH $BACKUP
+cp -r $JRUBY_VERSION_PATH $BACKUP
 
-echo "removing $JRUBY_VERSION_PATH"
-rm -r $JRUBY_VERSION_PATH
-rm $JRUBY_CURRENT_PATH
+#
+# gets the previously installed version
+#
+previous_version='1.5.0' # First version of the Mac installer
+function compare(){
+    echo "$1"
+    echo "$2"
+    
+}
 
-
-#FIXME: Look for previous versions
-IFS="."; declare -a Array=($JRUBYVER)
-MAJOR=${Array[0]}
-MINOR=${Array[1]}
-PATCH=${Array[2]}
-
-PREVIOUS_VERSION=''
 for version in `ls $JRUBY_ROOT`
 do
-    
+    if [ "$version" = "$JRUBYVER" ]
+    then
+        break
+    fi
+
+    IFS="."; declare -a version_1=($previous_version)
+    major_1=${version_1[0]}
+    minor_1=${version_1[1]}
+    patch_1=${version_1[2]}
+
+    IFS="."; declare -a version_2=($version)
+    major_2=${version_2[0]}
+    minor_2=${version_2[1]}
+    patch_2=${version_2[2]}
+
+    if [ "$major_2" -gt "$major_1" ]
+    then
+        previous_version=$version
+    else
+        if [ "$major_2" -eq "$major_1" ] && [ "$minor_2" -gt "$minor_1" ]
+        then
+            previous_version=$version
+        else
+            if [ "$major_2" -eq "$major_1" ] && [ "$minor_2" -eq "$minor_1" ] && [ "$patch_2" -gt "$patch_1" ]
+            then
+                previous_version=$version
+            fi
+        fi
+    fi
 done
 
-#FIXME: Remove Jruby from the path if there isn't a previous version
+#
+# removes the installed version
+#
+echo "removing $JRUBY_VERSION_PATH"
+rm -r "$JRUBY_VERSION_PATH"
+rm "$JRUBY_CURRENT_PATH"
+
+if [ -d "$JRUBY_ROOT/$previous_version" ]
+then
+#
+# links to the prevously installed version 
+#
+    ln -s "$JRUBY_ROOT/$previous_version" "$JRUBY_CURRENT_PATH"
+else
+#
+# FIXME:  Remove Jruby from the path if there isn't a previous version
+#
+    echo "FIXME:  Remove Jruby from the path if there isn't a previous version"
+fi
 
 echo "JRuby uninstalled succesfully!"
