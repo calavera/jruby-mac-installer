@@ -9,21 +9,26 @@ include FileUtils
 
 HOME = ARGV[0]
 JVERSION = ARGV[1]
+JRUBY_DEST = '/Library/Frameworks/JRuby.framework'
+
 DIST = "#{HOME}/dist"
-POSTFLIGHT = "scripts/postflight.patch-profile"
-PMDOC = "JRuby-installer.pmdoc/01jruby.xml"
-MACDIST = "jruby_dist"
-GEMSDIST = "gems_dist"
+POSTFLIGHT = 'scripts/postflight.patch-profile'
+PMDOC = 'JRuby-installer.pmdoc/01jruby.xml'
+MACDIST = 'jruby_dist'
+GEMSPMDOC = 'JRuby-installer.pmdoc/02gems.xml'
+GEMSMAC = 'rubygems/jruby_mac.rb'
+GEMSDIST = 'gems_dist'
 GEMSDEFAULTS = "#{MACDIST}/lib/ruby/site_ruby/1.8/rubygems/defaults"
 
-def replace_version_in(path)
+def replace_variables_in(path)
   File.open(path,"w") do |f|
     f.write ERB.new(File.read("#{path}.erb")).result
   end
 end
 
 def prepare_rubygems
-  cp "rubygems/jruby_mac.rb", GEMSDEFAULTS
+  replace_variables_in GEMSMAC
+  cp GEMSMAC, GEMSDEFAULTS
 
   File.open("#{GEMSDEFAULTS}/jruby.rb", "a+") do |file|
     file.write("require 'rubygems/defaults/jruby_mac'")
@@ -71,8 +76,9 @@ prepare_rubygems
 
 puts "- Setting package version"
 
-replace_version_in POSTFLIGHT
-replace_version_in PMDOC
+replace_variables_in POSTFLIGHT
+replace_variables_in PMDOC
+replace_variables_in GEMSPMDOC
 
 puts "- Building package, it takes a while, be patient my friend"
 
