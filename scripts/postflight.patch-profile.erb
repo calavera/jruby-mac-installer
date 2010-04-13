@@ -11,6 +11,9 @@ JRUBY_ROOT="<%= JRUBY_DEST %>/Versions"
 JRUBY_VERSION_PATH="$JRUBY_ROOT/$JRUBYVER"
 JRUBY_CURRENT_PATH="$JRUBY_ROOT/Current"
 
+JRUBY_INSTALLER_LOG="$TMPDIR/jruby.installer.log"
+JRUBY_INSTALLER_ERR="$TMPDIR/jruby.installer.err"
+
 if [ -f $JRUBY_CURRENT_PATH ]
 then
     rm $JRUBY_CURRENT_PATH
@@ -20,14 +23,14 @@ fi
 ln -s $JRUBY_VERSION_PATH $JRUBY_CURRENT_PATH
 
 # install native launcher
-$JRUBY_VERSION_PATH/bin/jruby -S gem install jruby-launcher --no-ri --no-rdoc > /tmp/jruby_installer.log 2> /tmp/jruby_installer.err
+$JRUBY_VERSION_PATH/bin/jruby -S gem install jruby-launcher --no-ri --no-rdoc > $JRUBY_INSTALLER_LOG 2> $JRUBY_INSTALLER_ERR
 
 # check if a previous verison of JRuby exists. Perhaps it's less safe but
 # it's also less hacky and if the user changes his path we keep his choice
 INSTALLED_VERSIONS=`ls $JRUBY_ROOT | wc -l`
 if [ $INSTALLED_VERSIONS -gt 2 ]
 then
-    echo "Seems JRuby was previously installed, skipping path modification" >> /tmp/jruby.installer.log
+    echo "Seems JRuby was previously installed, skipping path modification" >> $JRUBY_INSTALLER_LOG
     exit 0
 fi
 
