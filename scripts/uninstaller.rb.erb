@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+TMP = ENV['TMPDIR']
+
+begin
+
+  VERSION = '<%= JVERSION %>'
+  PATH = "<%= JRUBY_DEST %>/Versions/#{VERSION}"
+
+  LOG="#{TMP}jruby_uninstaller_log"
+  BACKUP_DIR="#{TMP}Jruby_Uninstaller_Backup_#{Time.now.strftime('%F_%H%M%S')}"
+  Dir.mkdir BACKUP_DIR
+  
+  File.open(LOG, 'w') do |f|
+    unless File.exist?(PATH)
+      f.puts "seems JRuby version #{VERSION} is not installed in #{PATH}"
+      exit
+    end
+    
+    dest_dir = File.join(BACKUP_DIR, PATH)
+    FileUtils.mkdir_p(dest_dir)
+    FileUtils.cp_r(file, File.dirname(dest_dir))
+
+    f.puts "removing file: #{PATH}"
+    FileUtils.rm_rf(PATH)
+    
+    f.puts "\n\njruby uninstalled succesfully!"
+    end
+  end
+
+rescue Exception => e
+  `echo "Something really bad happened" > #{TMP}jruby_uninstaller_error`
+  `echo "#{e.message}" >> #{TMP}jruby_uninstaller_error`
+  `echo "#{e.backtrace}" >> #{TMP}jruby_uninstaller_error`
+  exit 1
+end

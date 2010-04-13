@@ -7,6 +7,10 @@ require 'erb'
 require 'fileutils'
 include FileUtils
 
+#             #
+#  VARIABLES  #
+#             #
+
 HOME = ARGV[0]
 JVERSION = ARGV[1]
 JRUBY_DEST = '/Library/Frameworks/JRuby.framework'
@@ -19,6 +23,14 @@ GEMSPMDOC = 'JRuby-installer.pmdoc/02gems.xml'
 GEMSMAC = 'rubygems/jruby_mac.rb'
 GEMSDIST = 'gems_dist'
 GEMSDEFAULTS = "#{MACDIST}/lib/ruby/site_ruby/1.8/rubygems/defaults"
+
+UNINSTALLER_INDEX = 'JRuby-uninstaller.pmdoc/index.xml'
+UNINSTALLER_PMDOC = 'JRuby-uninstaller.pmdoc/01uninstaller.xml'
+UNINSTALLER_SCRIPT = 'scripts/uninstaller.rb'
+
+#           #
+#  HELPERS  #
+#           #
 
 def replace_variables_in(path)
   File.open(path,"w") do |f|
@@ -39,7 +51,7 @@ end
 
 def cleanup
   
-  [MACDIST, GEMSDIST, "pkg"].each do |f|
+  [MACDIST, GEMSDIST, 'pkg' ].each do |f|
     rm_r f if File.exist? f
   end
   
@@ -61,6 +73,9 @@ trap "SIGINT" do
   cleanup
 end
 
+#                               #
+#  START BUILDING THE PACKAGES  #
+#                               #
 
 puts "- Preparing JRuby distribution"
 
@@ -82,11 +97,16 @@ replace_variables_in POSTFLIGHT
 replace_variables_in PMDOC
 replace_variables_in GEMSPMDOC
 
+replace_variables_in UNINSTALLER_INDEX
+replace_variables_in UNINSTALLER_PMDOC
+replace_variables_in UNINSTALLER_SCRIPT
+
 puts "- Building package, it takes a while, be patient my friend"
 
 mkdir_p "pkg"
 
 exec_and_cleanup "time /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-installer.pmdoc --out pkg/JRuby-#{JVERSION}.pkg --version #{JVERSION}"
+exec_and_cleanup "time /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-uninstaller.pmdoc --out pkg/JRuby-uninstaller-#{JVERSION}.pkg --version #{JVERSION}"
 
 if File.exist? DMG = File.join(DIST, "JRuby-#{JVERSION}.dmg")
   rm DMG
