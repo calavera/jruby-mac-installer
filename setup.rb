@@ -88,7 +88,10 @@ mkdir_p "pkg"
 
 exec_and_cleanup "time /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -v --doc JRuby-installer.pmdoc --out pkg/JRuby-#{JVERSION}.pkg --version #{JVERSION}"
 
-exec_and_cleanup "time hdiutil create #{DIST}/JRuby-#{JVERSION}.dmg -volname JRuby-#{JVERSION} -fs HFS+ -srcfolder pkg"
+if File.exist? DMG = File.join(DIST, "JRuby-#{JVERSION}.dmg")
+  rm DMG
+end
+exec_and_cleanup "time hdiutil create #{DMG} -volname JRuby-#{JVERSION} -fs HFS+ -srcfolder pkg"
 
 puts "- Cleaning directories"
 
