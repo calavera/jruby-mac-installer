@@ -3,6 +3,7 @@ unless ARGV.size == 2
   exit -1
 end
 
+require 'erb'
 require 'fileutils'
 include FileUtils
 
@@ -16,17 +17,8 @@ GEMSDIST = "gems_dist"
 GEMSDEFAULTS = "#{MACDIST}/lib/ruby/site_ruby/1.8/rubygems/defaults"
 
 def replace_version_in(path)
-  cp path, "#{path}.back"
-  content = File.read(path)
-
-  File.open(path, "w+") do |file|
-    file.write content.gsub(/@JRUBYVER@/, JVERSION)
-  end
-end
-
-def restore(path)
-  if File.exist? "#{path}.back"
-    mv "#{path}.back", path
+  File.open(path,"w") do |f|
+    f.write ERB.new(File.read("#{path}.erb")).result
   end
 end
 
@@ -41,8 +33,6 @@ def prepare_rubygems
 end
 
 def cleanup
-  restore POSTFLIGHT
-  restore PMDOC
   
   [MACDIST, GEMSDIST, "pkg"].each do |f|
     rm_r f if File.exist? f
