@@ -15,7 +15,6 @@ then
     exit
 fi
 
-
 #
 # creates a backup of the installed version
 #
@@ -27,11 +26,6 @@ cp -r $JRUBY_VERSION_PATH $BACKUP
 # gets the previously installed version
 #
 previous_version='1.5.0' # First version of the Mac installer
-function compare(){
-    echo "$1"
-    echo "$2"
-    
-}
 
 for version in `ls $JRUBY_ROOT`
 do
