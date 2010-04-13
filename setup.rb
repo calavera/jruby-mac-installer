@@ -65,7 +65,9 @@ end
 puts "- Preparing JRuby distribution"
 
 cd HOME do
-  exec_and_cleanup "ant clean dist"
+  if ! File.exist? File.join(DIST, "jruby-bin-#{JVERSION}.zip")
+    exec_and_cleanup "ant clean dist"
+  end
 end
 
 exec_and_cleanup "unzip #{DIST}/jruby-bin-#{JVERSION}.zip -d ."
