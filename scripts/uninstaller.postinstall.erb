@@ -1,7 +1,7 @@
 #!/bin/sh
 
 JRUBYVER="<%= JVERSION %>"
-JRUBY_ROOT="<% JRUBY_DEST %>/Versions"
+JRUBY_ROOT="<%= JRUBY_DEST %>/Versions"
 
 JRUBY_VERSION_PATH="$JRUBY_ROOT/$JRUBYVER"
 JRUBY_CURRENT_PATH="$JRUBY_ROOT/Current"
@@ -101,9 +101,11 @@ then
     ln -s "$JRUBY_ROOT/$previous_version" "$JRUBY_CURRENT_PATH"
 else
 #
-# FIXME:  Remove Jruby from the path if there isn't a previous version
+# removes Jruby from the path if there isn't a previous version
 #
-    echo "FIXME:  Remove Jruby from the path if there isn't a previous version"
+    dirname=`dirname $0`
+    . "$dirname/patch_profile"
+    try_revert_patch
 fi
 
 echo "JRuby uninstalled succesfully!"

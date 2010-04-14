@@ -27,6 +27,7 @@ GEMSDEFAULTS = "#{MACDIST}/lib/ruby/site_ruby/1.8/rubygems/defaults"
 UNINSTALLER_INDEX = 'JRuby-uninstaller.pmdoc/index.xml'
 UNINSTALLER_PMDOC = 'JRuby-uninstaller.pmdoc/01uninstaller.xml'
 UNINSTALLER_SCRIPT = 'scripts/uninstaller.postinstall'
+UNINSTALLER_WELCOME= 'Welcome.uninstaller.rtf'
 
 #           #
 #  HELPERS  #
@@ -100,6 +101,7 @@ replace_variables_in GEMSPMDOC
 replace_variables_in UNINSTALLER_INDEX
 replace_variables_in UNINSTALLER_PMDOC
 replace_variables_in UNINSTALLER_SCRIPT
+replace_variables_in UNINSTALLER_WELCOME
 
 puts "- Building package, it takes a while, be patient my friend"
 

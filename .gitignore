@@ -9,3 +9,4 @@ scripts/installer.postflight
 scripts/uninstaller.postinstall
 JRuby-uninstaller.pmdoc/index.xml
 JRuby-uninstaller.pmdoc/01uninstaller.xml
+Welcome.uninstaller.rtf
