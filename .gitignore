@@ -5,7 +5,7 @@ gems_dist
 JRuby-installer.pmdoc/01jruby.xml
 JRuby-installer.pmdoc/02gems.xml
 rubygems/jruby_mac.rb
-scripts/postflight.patch-profile
+scripts/installer.postflight
 scripts/uninstaller.postinstall
 JRuby-uninstaller.pmdoc/index.xml
 JRuby-uninstaller.pmdoc/01uninstaller.xml

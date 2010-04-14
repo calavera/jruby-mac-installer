@@ -16,7 +16,7 @@ JVERSION = ARGV[1]
 JRUBY_DEST = '/Library/Frameworks/JRuby.framework'
 
 DIST = "#{HOME}/dist"
-POSTFLIGHT = 'scripts/postflight.patch-profile'
+POSTFLIGHT = 'scripts/installer.postflight'
 PMDOC = 'JRuby-installer.pmdoc/01jruby.xml'
 MACDIST = 'jruby_dist'
 GEMSPMDOC = 'JRuby-installer.pmdoc/02gems.xml'
