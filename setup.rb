@@ -51,11 +51,10 @@ def prepare_rubygems
 end
 
 def cleanup
-  
   [MACDIST, GEMSDIST, 'pkg' ].each do |f|
     rm_r f if File.exist? f
   end
-  
+
   exit
 end
 
@@ -80,13 +79,18 @@ end
 
 puts "- Preparing JRuby distribution"
 
-cd HOME do
-  if ! File.exist? File.join(DIST, "jruby-bin-#{JVERSION}.zip")
-    exec_and_cleanup "ant clean dist"
+dist_directory = File.join(DIST, "jruby-#{JVERSION}")
+if !File.exist?(dist_directory) || !File.directory?(dist_directory)
+  cd HOME do
+    if ! File.exist? File.join(DIST, "jruby-bin-#{JVERSION}.zip")
+      exec_and_cleanup "ant clean dist"
+    end
   end
-end
 
-exec_and_cleanup "unzip #{DIST}/jruby-bin-#{JVERSION}.zip -d ."
+  exec_and_cleanup "unzip #{DIST}/jruby-bin-#{JVERSION}.zip -d ."
+else
+  mv dist_directory, "jruby-#{JVERSION}"
+end
 
 mv "jruby-#{JVERSION}", MACDIST
 
