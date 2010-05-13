@@ -14,9 +14,9 @@ JRUBY_CURRENT_PATH="$JRUBY_ROOT/Current"
 JRUBY_INSTALLER_LOG="$TMPDIR/jruby.installer.log"
 JRUBY_INSTALLER_ERR="$TMPDIR/jruby.installer.err"
 
-if [ -f $JRUBY_CURRENT_PATH ]
+if [ -d $JRUBY_CURRENT_PATH ]
 then
-    rm $JRUBY_CURRENT_PATH
+    rm -rf $JRUBY_CURRENT_PATH
 fi
 
 # create symlink to the current directory
